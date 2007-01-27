@@ -176,7 +176,7 @@ Content-Disposition: form-data; name="version_id"\r
     assert_equal '/api/REST/add_target', Net::HTTP.paths.first
 
     assert_equal 1, Net::HTTP.params.length
-    assert_equal 'hash=da16057e8017ecb7b39f580c06558cf4&platform=powerpc-darwin8.7.0&release_date=2006-08-25&user=username&version=1.8.5',
+    assert_equal 'api_version=1.0.0&hash=c600c401ac061e996ee3cfc87493ca85&platform=powerpc-darwin8.7.0&release_date=2006-08-25&user=username&version=1.8.5',
                  Net::HTTP.params.first
   end
 
@@ -197,10 +197,34 @@ Content-Disposition: form-data; name="version_id"\r
     assert_equal '/api/REST/add_target', Net::HTTP.paths.first
 
     assert_equal 1, Net::HTTP.params.length
-    assert_equal 'hash=c53189d0aa04121a29d957e8e264adef&platform=c&release_date=b&user=username&version=a',
+    assert_equal 'api_version=1.0.0&hash=f873667a60f58a38b82a38ba585a0a36&platform=c&release_date=b&user=username&version=a',
                  Net::HTTP.params.first
 
     assert_equal 'Invalid login', e.message
+  end
+
+  def test_add_target_wrong_version
+    Net::HTTP.responses << <<-EOF.strip
+<error>
+  <message>Your API version 1.0.0 is not compatible with this Firebrigade API, = 2.0.0</message>
+</error>
+    EOF
+
+    e = assert_raise Firebrigade::API::WrongAPIVersion do
+      @fa.add_target 'a', 'b', 'c'
+    end
+
+    assert_equal true, Net::HTTP.responses.empty?
+
+    assert_equal 1, Net::HTTP.paths.length
+    assert_equal '/api/REST/add_target', Net::HTTP.paths.first
+
+    assert_equal 1, Net::HTTP.params.length
+    assert_equal 'api_version=1.0.0&hash=f873667a60f58a38b82a38ba585a0a36&platform=c&release_date=b&user=username&version=a',
+                 Net::HTTP.params.first
+
+    assert_equal 'Your API version 1.0.0 is not compatible with this Firebrigade API, = 2.0.0',
+                 e.message
   end
 
   def test_add_version
@@ -349,8 +373,28 @@ Content-Disposition: form-data; name="version_id"\r
 
     assert_equal true, URI::HTTP.responses.empty?
     assert_equal 1, URI::HTTP.uris.length
-    assert_equal 'http://firebrigade.example.com/api/REST/get_target?platform=powerpc-darwin8.7.0&release_date=2006-08-25&username=username&version=1.8.5',
+    assert_equal 'http://firebrigade.example.com/api/REST/get_target?api_version=1.0.0&platform=powerpc-darwin8.7.0&release_date=2006-08-25&username=username&version=1.8.5',
                  URI::HTTP.uris.first
+  end
+
+  def test_get_target_wrong_version
+    URI::HTTP.responses << <<-EOF.strip
+<error>
+  <message>Your API version 1.0.0 is not compatible with this Firebrigade API, = 2.0.0</message>
+</error>
+    EOF
+
+    e = assert_raises Firebrigade::API::WrongAPIVersion do
+      @fa.get_target 'a', 'b', 'c'
+    end
+
+    assert_equal true, URI::HTTP.responses.empty?
+    assert_equal 1, URI::HTTP.uris.length
+    assert_equal 'http://firebrigade.example.com/api/REST/get_target?api_version=1.0.0&platform=c&release_date=b&username=username&version=a',
+                 URI::HTTP.uris.first
+
+    assert_equal 'Your API version 1.0.0 is not compatible with this Firebrigade API, = 2.0.0',
+                 e.message
   end
 
   def test_get_target_nonexistent
@@ -366,7 +410,7 @@ Content-Disposition: form-data; name="version_id"\r
 
     assert_equal true, URI::HTTP.responses.empty?
     assert_equal 1, URI::HTTP.uris.length
-    assert_equal 'http://firebrigade.example.com/api/REST/get_target?platform=c&release_date=b&username=username&version=a',
+    assert_equal 'http://firebrigade.example.com/api/REST/get_target?api_version=1.0.0&platform=c&release_date=b&username=username&version=a',
                  URI::HTTP.uris.first
 
     assert_equal 'No such target exists', e.message

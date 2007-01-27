@@ -8,11 +8,15 @@ class Firebrigade::API < RCRest
 
   class Error < RCRest::Error; end
 
-  class NotFound < Error; end
-
   class InvalidLogin < Error; end
 
+  class NotFound < Error; end
+
+  class WrongAPIVersion < Error; end
+
   VERSION = '1.0.0'
+
+  API_VERSION = '1.0.0'
 
   Build = Struct.new :id, :successful, :duration, :created_on, :version_id,
                      :target_id
@@ -48,7 +52,7 @@ class Firebrigade::API < RCRest
 
   def add_target(version, release_date, platform)
     post :add_target, :version => version, :release_date => release_date,
-                      :platform => platform
+                      :platform => platform, :api_version => API_VERSION
   end
 
   def add_version(name, project_id)
@@ -62,6 +66,7 @@ class Firebrigade::API < RCRest
     case error.text
     when /No such \w+ exists/ then raise NotFound, error.text
     when 'Invalid login'      then raise InvalidLogin, error.text
+    when /Your API version/   then raise WrongAPIVersion, error.text
     else                           raise Error, error.text
     end
   end
@@ -80,7 +85,8 @@ class Firebrigade::API < RCRest
 
   def get_target(version, release_date, platform)
     get :get_target, :version => version, :release_date => release_date,
-                     :platform => platform, :username => @username
+                     :platform => platform, :username => @username,
+                     :api_version => API_VERSION
   end
 
   def get_version(name, project_id)
@@ -100,7 +106,9 @@ class Firebrigade::API < RCRest
   end
 
   def parse_response(xml) # :nodoc:
-    child = xml.elements['/ok'].elements[1]
+    ok = xml.elements['/ok']
+    raise RCRest::Error, xml.to_s if ok.nil?
+    child = ok.elements[1]
     obj = nil
 
     case child.name
@@ -138,6 +146,12 @@ class Firebrigade::API < RCRest
     end
 
     obj
+  rescue NoMethodError
+    puts $!
+    puts $!.backtrace.join("\n\t")
+    puts
+    puts xml
+    raise
   end
 
   def set_hash(params)
