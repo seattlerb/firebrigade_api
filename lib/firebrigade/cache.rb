@@ -1,7 +1,16 @@
 require 'rubygems'
 require 'firebrigade/api'
 
+##
+# Firebrigade::Cache is a wrapper around Firebrigade::API that caches lookups
+# so you don't hammer the web server unnecessarily.  It handles the most
+# common operations for Tinderbox::GemTinderbox and Tinderbox::Build.
+
 class Firebrigade::Cache
+
+  ##
+  # Creates a new Firebrigade::Cache that will connect to +host+ with
+  # +username+ and +password+.
 
   def initialize(host, username, password)
     @fa = Firebrigade::API.new host, username, password
@@ -13,6 +22,9 @@ class Firebrigade::Cache
     @targets = {} # [version, release_date, platform] => target_id
     @builds = {} # [version_id, target_id] => build_id
   end
+
+  ##
+  # Retrieves the id for a build matching +version_id+ and +target_id+.
 
   def get_build_id(version_id, target_id)
     build_args = [version_id, target_id]
@@ -27,7 +39,7 @@ class Firebrigade::Cache
   end
 
   ##
-  # Fetches or creates a target matching +version+, +release_date+ and
+  # Retrieves or creates a target matching +version+, +release_date+ and
   # +platform+.  Returns the target's id.
 
   def get_target_id(version = RUBY_VERSION, release_date = RUBY_RELEASE_DATE,
@@ -41,8 +53,8 @@ class Firebrigade::Cache
   end
 
   ##
-  # Fetches or creates a version (including project and owner) for +spec+.
-  # Returns the version's id.
+  # Fetches or creates a version (including project and owner) for the
+  # Gem::Specification +spec+ and returns the version's id.
 
   def get_version_id(spec)
     owner = spec.rubyforge_project
