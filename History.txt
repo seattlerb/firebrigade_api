@@ -1,5 +1,6 @@
-== 1.0.0 / 2006-11-26
+== 1.0.0 / 2007-01-30
 
-* 1 major enhancement
-  * Birthday!
+* Birthday!
+* Ruby interface to http://firebrigade.seattlerb.org
+* User-friendly cache for implementing Tinderbox
 

@@ -5,20 +5,27 @@ by Eric Hodel
 http://seattlerb.rubyforge.org/firebrigade_api
 
 == DESCRIPTION
-  
-An API for Firebrigade
+
+An API wrapper for http://firebrigade.seattlerb.org
 
 == FEATURES/PROBLEMS
-  
-* FIX (list of features or problems)
+
+* Fully wraps Firebrigade API
+* Provides friendly cache for implementing applications like Tinderbox
+* No way to retrieve build log (easy with OpenURI)
+* No way to query for owners/projects/etc.  (Not implemented in API.)
 
 == SYNOPSYS
 
-  FIX (code sample of usage)
+  require 'rubygems'
+  require 'firebrigade/api'
+  
+  fa = Firebrigade::API.new 'firebrigade.seattlerb.org', 'username', 'password'
 
 == REQUIREMENTS
 
-* FIX (list of requirements)
+* rc-rest
+* Connection to firebrigade.seattlerb.org
 
 == INSTALL
 
