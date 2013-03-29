@@ -15,7 +15,7 @@ An API wrapper for http://firebrigade.seattlerb.org
 * No way to retrieve build log (easy with OpenURI)
 * No way to query for owners/projects/etc.  (Not implemented in API.)
 
-== SYNOPSYS
+== SYNOPSIS
 
   require 'rubygems'
   require 'firebrigade/api'
