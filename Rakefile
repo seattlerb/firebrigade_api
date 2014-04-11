@@ -6,7 +6,6 @@ $LOAD_PATH.unshift 'lib'
 require 'firebrigade/api'
 
 Hoe.new 'firebrigade_api', Firebrigade::API::VERSION do |p|
-  p.rubyforge_name = 'seattlerb'
   p.author = 'Eric Hodel'
   p.email = 'drbrain@segment7.net'
   p.summary = 'API for Firebrigade'
